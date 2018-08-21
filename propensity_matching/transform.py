@@ -24,8 +24,7 @@ def transform(df: DataFrame,
               prob_mod: mlc.Model,
               method: Optional[str] = None,
               metric: Optional[str] = None,
-              match_kwargs: Optional[dict] = None) ->Tuple[DataFrame, dict]:
-
+              match_kwargs: Optional[dict] = None) ->Tuple[DataFrame, dict]
     r"""Create a propensity matched dataset
 
     Public entry point point for transform. Depending on arguments
@@ -954,8 +953,8 @@ def _adjust_balance(t_df: DataFrame,
     if t_count > desired_t_count:
         logging.getLogger(__name__).info("adjustment of treatment necessary")
         frac = desired_t_count/t_count
-        t_adjusted_df = t_df.sample(fraction=frac, withReplacement=False, seed=42)
-        t_adj_count = t_adjusted_df.count()
+        t_adj_df = t_df.sample(fraction=frac, withReplacement=False, seed=42)
+        t_adj_count = t_adj_df.count()
         scaled = t_adj_count/t_count
         logging.getLogger(__name__).info("scaled: {s:.2f}   adjusted treatment count {tac:,}".format(s=scaled, tac=t_adj_count))
 
@@ -968,17 +967,25 @@ def _adjust_balance(t_df: DataFrame,
     elif c_can_count > (t_count * mean_ratio * 10):
         logging.getLogger(__name__).info("too many control candidates, sampling them down")
         frac = (t_count * mean_ratio * 10)/c_can_count
-        c_adjusted_df = c_can_df.sample(fraction=frac, withReplacement=False, seed=42)
-        c_adj_count = c_adjusted_df.count()
+        c_adj_df = c_can_df.sample(fraction=frac, withReplacement=False, seed=42)
+        c_adj_count = c_adj_df.count()
         logging.getLogger(__name__).info(
         "controls cans reduced: adjusted control count {cac:,}".format(cac=c_adj_count))
+
+        scaled = 1
 
         t_adj_count = t_count
         t_adj_df = t_df
 
     else:
         logging.getLogger(__name__).info("adjustment of treatment NOT necessary")
-        t_adjusted_df = t_df
+
+        t_adj_count = t_count
+        t_adj_df = t_df
+
+        c_adj_count = c_can_count
+        c_adj_df = c_can_df
+
         scaled = 1
     match_info = {
         'scaled': scaled,
@@ -990,7 +997,7 @@ def _adjust_balance(t_df: DataFrame,
         'adj_c_count': c_adj_count
         }
     if t_adj_count > c_adj_count:
-        logging.getLogger(__name__).critical("more treatments than controls, this shouldnt have happened")
+        logging.getLogger(__name__).critical("more treatments than controls, this shouldn't have happened")
         raise ValueError("more treatments that controls")
 
     return t_adj_df, c_adj_df, match_info

@@ -102,7 +102,7 @@ def impact(df: pyspark.sql.DataFrame,
                                    predictionCol='prediction_{0}'.format(response_col),
                                    rawPredictionCol='rawPrediction_{0}'.format(response_col),
                                    probabilityCol='probability_{0}'.format(response_col),
-                                   regParam=.05,
+                                   regParam=.01,
                                    elasticNetParam=.5
                                    )
     lrm_r = lre_r.fit(df)
