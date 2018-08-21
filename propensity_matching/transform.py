@@ -24,7 +24,7 @@ def transform(df: DataFrame,
               prob_mod: mlc.Model,
               method: Optional[str] = None,
               metric: Optional[str] = None,
-              match_kwargs: Optional[dict] = None) ->Tuple[DataFrame, dict]
+              match_kwargs: Optional[dict] = None) ->Tuple[DataFrame, dict]:
     r"""Create a propensity matched dataset
 
     Public entry point point for transform. Depending on arguments
